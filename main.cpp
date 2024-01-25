@@ -1,6 +1,6 @@
-/*
 #include "mbed.h"
 #include "platform/mbed_thread.h"
+/*
 
 #define WAVE2_PERIOD_US 10
 
@@ -37,9 +37,7 @@ int main()
 
 
 //program 4/5
-#include "mbed.h"
-#include "platform/mbed_thread.h"
-
+/*
 int main()
 {
     BusOut display(D2,D3,D4,D5,D9,D10,D11,D12);
@@ -69,6 +67,7 @@ int main()
                     case 8: display = 0x7F; break; //8
                     case 9: display = 0x6F; break; //9
                     */ // program 5
+                    /*
                     case 0: display = 0x75; break; //H
                     case 2: display = 0x7A; break; //E
                     case 4: display = 0x38; break; //L
@@ -81,3 +80,36 @@ int main()
         }
     }
 }
+    */
+//program 6b
+
+// This is the way they want it done
+AnalogOut sawtoothOut(A1);
+int main(){ 
+    while(true){
+        for(int i = 0; i < 100; i++){
+            sawtoothOut = i * 0.030303; // Since i only goes up to 99 we need an ugly recurring decimal to hit 3v
+            wait_us(100); // 1/100th of the period of the output wave
+        }
+    }
+}
+/*
+// This is the way I'd do it (assuming time.h is available)
+#include "time.h"
+
+#define X_COEFF 100
+#define Y_COEFF 3
+
+AnalogOut sawtoothOut(A1);
+
+int main(){ // This creates a much smoother wave, only downside is since there's technically infinite harmonics there could be aliasing issues
+    clock_t c; // The way to fix the aliasing is to generate a bandlimited wave using a fourier series but that would require an FFT library which we don't have
+    float t;
+    while(true){
+        c = clock();
+        t = c/CLOCKS_PER_SEC;
+        sawtoothOut = Y_COEFF * ((t * X_COEFF) - floor(t * X_COEFF)); //t - floor(t) creates a sawtooth with amplitude and period of 1, coefficients set the desired freq and ampl
+        wait_ms(1); // This line is just so it's not looping as fast is it possibly can, might not even be needed
+    }
+}
+*/
