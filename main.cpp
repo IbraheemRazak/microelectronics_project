@@ -80,19 +80,37 @@ int main()
         }
     }
 }
-    */
+*/
+
+//program 6a
+AnalogOut aOut(A1);
+
+int main(){
+    while(true){
+        aOut = 0.5/3.3;
+        wait_ms(500);
+        aOut = 1/3.3;
+        wait_ms(500);
+        aOut = 2/3.3;
+        wait_ms(500);
+        aOut = 2.5/3.3; //since aOut setting aOut to 1 means max output (3.3v), these numbers need to be scaled
+        wait_ms(500);
+    }
+}
+/*
 //program 6b
 
 // This is the way they want it done
-AnalogOut sawtoothOut(A1);
+AnalogOut sawtoothOut(A2);
 int main(){ 
     while(true){
         for(int i = 0; i < 100; i++){
-            sawtoothOut = i * 0.030303; // Since i only goes up to 99 we need an ugly recurring decimal to hit 3v
+            sawtoothOut = i * 0.010101; // Since i only goes up to 99 we need an ugly recurring decimal to hit 3v
             wait_us(100); // 1/100th of the period of the output wave
         }
     }
 }
+*/
 /*
 // This is the way I'd do it (assuming time.h is available)
 #include "time.h"
@@ -100,7 +118,7 @@ int main(){
 #define X_COEFF 100
 #define Y_COEFF 3
 
-AnalogOut sawtoothOut(A1);
+AnalogOut sawtoothOut(A3);
 
 int main(){ // This creates a much smoother wave, only downside is since there's technically infinite harmonics there could be aliasing issues
     clock_t c; // The way to fix the aliasing is to generate a bandlimited wave using a fourier series but that would require an FFT library which we don't have
@@ -108,7 +126,7 @@ int main(){ // This creates a much smoother wave, only downside is since there's
     while(true){
         c = clock();
         t = c/CLOCKS_PER_SEC;
-        sawtoothOut = Y_COEFF * ((t * X_COEFF) - floor(t * X_COEFF)); //t - floor(t) creates a sawtooth with amplitude and period of 1, coefficients set the desired freq and ampl
+        sawtoothOut = (Y_COEFF * ((t * X_COEFF) - floor(t * X_COEFF)))/3.3; //t - floor(t) creates a sawtooth with amplitude and period of 1, coefficients set the desired freq and ampl
         wait_ms(1); // This line is just so it's not looping as fast is it possibly can, might not even be needed
     }
 }
