@@ -45,7 +45,6 @@ int main()
         for (int i = 0; i < 10; i++){
             if(i%2==0){
                 switch(i){
-                    /*
                     case 0: display = 0x01; break; //UR 
                     case 1: display = 0x02; break; //UU 
                     case 2: display = 0x04; break; //BR
@@ -83,51 +82,102 @@ int main()
 */
 
 //program 6a
-AnalogOut aOut(A1);
+/*
+AnalogOut Aout(A3); //create an analogue output on pin A3
+//output constant voltages of 0.5 V, 1.0 V, 2.0 V and 2.5 V
 
-int main(){
-    while(true){
-        aOut = 0.5/3.3;
-        wait_ms(500);
-        aOut = 1/3.3;
-        wait_ms(500);
-        aOut = 2/3.3;
-        wait_ms(500);
-        aOut = 2.5/3.3; //since aOut setting aOut to 1 means max output (3.3v), these numbers need to be scaled
-        wait_ms(500);
+int main() 
+{
+    float v1 = 0.5/3.3;
+    float v2 = 1/3.3;
+    float v3 = 2/3.3;
+    float v4 = 2.5/3.3;
+    while (true) 
+    {
+        Aout=(v1);
+        wait_us(2000000);
+
+        Aout=(v2);
+        wait_us(2000000);
+
+        Aout=(v3);
+        wait_us(2000000);
+
+        Aout=(v4);
+        wait_us(2000000);
     }
 }
-/*
+*/
+
 //program 6b
 
 // This is the way they want it done
-AnalogOut sawtoothOut(A2);
+/*
+AnalogOut sawtoothOut(A3);
 int main(){ 
     while(true){
         for(int i = 0; i < 100; i++){
-            sawtoothOut = i * 0.010101; // Since i only goes up to 99 we need an ugly recurring decimal to hit 3v
-            wait_us(100); // 1/100th of the period of the output wave
+            sawtoothOut = i * 0.01 * 3/3.3;
+            wait_us(70);
         }
     }
 }
 */
-/*
+
 // This is the way I'd do it (assuming time.h is available)
+/*
 #include "time.h"
 
-#define X_COEFF 100
+#define X_COEFF 10
 #define Y_COEFF 3
 
 AnalogOut sawtoothOut(A3);
 
 int main(){ // This creates a much smoother wave, only downside is since there's technically infinite harmonics there could be aliasing issues
-    clock_t c; // The way to fix the aliasing is to generate a bandlimited wave using a fourier series but that would require an FFT library which we don't have
     float t;
+    float start = float(clock());
     while(true){
-        c = clock();
-        t = c/CLOCKS_PER_SEC;
+        t = (float(clock())-start)/CLOCKS_PER_SEC;
         sawtoothOut = (Y_COEFF * ((t * X_COEFF) - floor(t * X_COEFF)))/3.3; //t - floor(t) creates a sawtooth with amplitude and period of 1, coefficients set the desired freq and ampl
-        wait_ms(1); // This line is just so it's not looping as fast is it possibly can, might not even be needed
+        //sawtoothOut = t;
+        wait_us(1000); // This line is just so it's not looping as fast is it possibly can, might not even be needed
+    }
+}
+*/
+
+
+// program 7
+
+int main()
+{
+    DigitalOut LED1(D9);
+    DigitalOut LED2(D10);
+    DigitalOut LED3(D11);
+    DigitalOut LED4(D12);
+    AnalogIn potentiometerIn(A2);
+    while(true){
+        if(potentiometerIn > (0.6/3.3)){LED1 = true;} else {LED1 = false;}
+        if(potentiometerIn > (1.2/3.3)){LED2 = true;} else {LED2 = false;}
+        if(potentiometerIn > (1.8/3.3)){LED3 = true;} else {LED3 = false;}
+        if(potentiometerIn > (2.4/3.3)){LED4 = true;} else {LED4 = false;}
+    }
+}
+
+/*
+// program 8
+#include "mbed.h"
+#include "TextLCD.h"
+
+int main(){
+    {
+
+
+        while(true){
+
+
+
+
+        }
     }
 }
 */
